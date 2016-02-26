@@ -5,7 +5,7 @@ This CNV Pipeline is for the estimating the number of DUF1220 copies from whole 
 
 > Astling, DP, Heft IE, Jones, KL, Sikela, JM. "High resolution measurement of DUF1220 domain copy number from whole genome sequence data"
 
-### config file
+### config.sh
 
 The config file is where all the project specific parameters and sample names should go. The other scripts should be as abstract as possible for reuse. 
 
@@ -26,5 +26,7 @@ This script downloads the fastq files for a particular sample from the 1000 Geno
 
 ### batch_bowtie2.sh
 
-This script submits jobs to the LSF queuing system and runs both the downloading of the fastq files and aligns them to the genome
+This script submits jobs to the LSF queuing system and runs both the downloading of the fastq files and aligns them to the genome. It can be submitted to the queue like so:
+
+    bsub < code/batch_bowtie2.sh
 
