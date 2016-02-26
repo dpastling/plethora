@@ -15,10 +15,6 @@ my $sample = $ARGV[0];
 my $sequence_index_file = $ARGV[1];
 my $ftp_address = "ftp://ftp-trace.ncbi.nih.gov/1000genomes/ftp/phase3";
 
-# Old hard coded files
-#my $sequence_index_file = "sample_lists/1000Genomes_samples_needed.txt";
-#my $sequence_index_file = "sample_lists/CLM_to_analyze_without_exome.txt";
-
 my $exit_status;
 if (! -d fastq) system("mkdir fastq"); 
 if (! -d fastq/$sample) system("mkdir fastq/$sample");
