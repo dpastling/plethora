@@ -17,7 +17,7 @@ sample=${SAMPLES[$(($LSB_JOBINDEX - 1))]}
 
 code/download_sample.pl $sample $sample_index
 
-# Bowtie requires that the file names be chained together with a comma
+# Bowtie requires that the file names be concatenated with a comma
 first_pair=`find fastq/$sample -name '*_1.filt.fastq.gz'  | perl -pe 's/\n/,/g'`
 second_pair=`find fastq/$sample -name '*_2.filt.fastq.gz' | perl -pe 's/\n/,/g'`
 
