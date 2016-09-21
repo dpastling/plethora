@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#BSUB -J cleanup[1-30]%5
+#BSUB -J coverage[1-5]%5
 #BSUB -e logs/coverage_%J.log
 #BSUB -o logs/coverage_%J.out
 #BSUB -R "select[mem>40] rusage[mem=40]"
@@ -22,7 +22,7 @@ samtools sort -n -@ 5 -m 5G $bam_file.bam ${bam_file}_sorted
 bedtools bamtobed -bedpe -split -i ${bam_file}_sorted.bam > $bed_file.bed
 
 # remove alignment files if bed has correct number of reads
-code/clean_files.pl -a $alignment_dir -b $bed_dir $sample
+code/clean_files.pl -a $alignment_dir -b $bed_dir --rm_fastq $sample
 
 # Merge reads into fragments
 code/parse_bed.pl $bed_file.bed
