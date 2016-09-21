@@ -8,8 +8,8 @@ master_ref=data/duf_reference.bed
 # any additional parameters to be passed to bowtie should go here
 bowtie_params=""
 
-result_folder=results
 alignment_dir=alignments
+bed_dir=results
 
 SAMPLES=(
 HG00148
