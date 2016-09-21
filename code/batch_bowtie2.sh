@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#BSUB -J align[1-30]%10
+#BSUB -J align[1-5]%10
 #BSUB -e logs/bowtie2_%J.log
 #BSUB -o logs/bowtie2_%J.out
 #BSUB -R "select[mem>5] rusage[mem=5] span[hosts=1]"
@@ -21,7 +21,5 @@ code/download_sample.pl $sample $sample_index
 first_pair=`find fastq/$sample -name '*_1.filt.fastq.gz'  | perl -pe 's/\n/,/g'`
 second_pair=`find fastq/$sample -name '*_2.filt.fastq.gz' | perl -pe 's/\n/,/g'`
 
-bowtie2 -p 12 $bowtie_params --very-sensitive --minins 0 --maxins 2000 -x $genome -1 $first_pair -2 $second_pair | samtools view -hSb - > $result_folder/${sample}.bam
-
-code/clean_files.pl -m $sample_index $sample
+bowtie2 -p 12 $bowtie_params --very-sensitive --minins 0 --maxins 2000 -x $genome -1 $first_pair -2 $second_pair | samtools view -hSb - > $alignment_dir/${sample}.bam
 
