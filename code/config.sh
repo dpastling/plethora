@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-ftp_folder="/vol2/data/1000genomes/ftp-trace.ncbi.nih.gov/ftp/data"
-sample_index=sample_lists/1000Genomes_samples_needed.txt
+sample_index=data/1000Genomes_samples.txt
 genome=$HOME/genomes/bowtie2.2.5_indicies/hg38/hg38
 master_ref=data/duf_reference.bed
 
