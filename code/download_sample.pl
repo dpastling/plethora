@@ -16,8 +16,8 @@ my $sequence_index_file = $ARGV[1];
 my $ftp_address = "ftp://ftp-trace.ncbi.nih.gov/1000genomes/ftp/phase3";
 
 my $exit_status;
-if (! -d fastq) system("mkdir fastq"); 
-if (! -d fastq/$sample) system("mkdir fastq/$sample");
+if (! -d "fastq") { system("mkdir fastq"); } 
+if (! -d "fastq/$sample") { system("mkdir fastq/$sample"); }
 open(FASTQ, $sequence_index_file) or die "cannot open the needed sequence index file: $sequence_index_file";
 while(<FASTQ>)
 {
@@ -35,18 +35,23 @@ while(<FASTQ>)
 
 	if ($exit_status != 0)
 	{
-		print STDERR "problem downloading $ftp_address/$file_path\n";
-		print STDERR "Exiting...";
+		warn "problem downloading $ftp_address/$file_path\n";
+		warn "Exiting...";
 		exit 1;
 	}
 	my $file_checksum = `md5sum fastq/$sample/$file`;
 	chomp $file_checksum;
 	$file_checksum =~ s/^([^ ]+?) (.+?)$/$1/;
+
+	# For some reason the number of reads and the checksum do not match
+	# what is listed in the sequence.index file (as of Sept 21, 2016)
+	# We will disable the exit of the download script for now, but still
+	# report an error when these discrepancies occur
 	if ($file_checksum ne $checksum_ideal)
 	{
-		print STDERR "Invaid checksum for $file_path\n";
-		print STDERR "should be $checksum_ideal, but is $file_checksum\n";
-		exit 1;
+		warn "Invaid checksum for $file_path\n";
+		warn "should be $checksum_ideal, but is $file_checksum\n";
+#		exit 1;
 	}
 }
 close(FASTQ);
