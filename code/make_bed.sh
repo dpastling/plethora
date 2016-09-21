@@ -29,7 +29,7 @@ code/parse_bed.pl $bed_file.bed
 sort -k 1,1 -k 2,2n -T $bed_dir/ ${bed_file}_edited.bed > ${bed_file}_sorted.bed
 
 # Calcualte coverage
-bedtools intersect -wao -sorted -a $master_ref -b ${bed_file}_sorted > ${bed_file}_temp.bed
+bedtools intersect -wao -sorted -a $master_ref -b ${bed_file}_sorted.bed > ${bed_file}_temp.bed
 awk 'OFS="\t" {print $4,$2,$3,$1,$13}' ${bed_file}_temp.bed | bedtools merge -scores sum -i - > ${bed_file}_coverage.bed
 awk 'OFS="\t" { print $1, $4 / ($3 - $2 + 1)}' ${bed_file}_coverage.bed > ${bed_file}_read_depth.bed
 
