@@ -10,7 +10,7 @@
 # catch unset variables, non-zero exits in pipes and calls, enable x-trace.
 set -o nounset -o pipefail -o errexit -x
 
-source code/config.sh
+source code/1000genomes/config.sh
 
 # LSB_JOBINDEX is the job array position
 sample=${SAMPLES[$(($LSB_JOBINDEX - 1))]}
