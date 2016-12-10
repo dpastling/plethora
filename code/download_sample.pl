@@ -31,6 +31,8 @@ while(<FASTQ>)
 	$file =~ s/^.+?\/([^\/]+)$/$1/;
 	my $checksum_ideal  = $attributes[1];
 
+	# TODO: delete old file if it exists
+
 	$exit_status = system("cd fastq/$sample; wget --no-verbose $ftp_address/$file_path");
 
 	if ($exit_status != 0)
@@ -52,6 +54,8 @@ while(<FASTQ>)
 		warn "Invaid checksum for $file_path\n";
 		warn "should be $checksum_ideal, but is $file_checksum\n";
 #		exit 1;
+	} else {
+		print "checksum valid for $file_path\n";
 	}
 }
 close(FASTQ);
