@@ -30,7 +30,7 @@ if [ "$pairing" == "paired" ]
 then
     samtools sort -n -@ 5 -m 5G $bam ${output}_sorted
     bedtools bamtobed -split -bedpe -i ${output}_sorted.bam > $output.bed
-    code/parse_bed.pl $output.bed
+    code/merge_pairs.pl $output.bed
 elif [ "$pairing" == "single" ]
 then
     bedtools bamtobed -i $bam > ${output}_edited.bed
