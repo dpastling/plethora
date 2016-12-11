@@ -24,8 +24,13 @@ for it. Instructions for doing this can be found on the bowtie website.
 
 ## Geting Started
 
-A set of scripts for processing the 1000 Genomes data can be found in the
-`code/1000genomes` folder
+Below is a description of the main scripts used for the pipeline. A set of
+scripts for applying this pipeline to data from the 1000 Genomes data can be
+found in the `code/1000genomes` folder. The scripts in this folder are for
+submitting jobs to the LSF job queuing system for parallelizing the processing
+of multiple samples. These scripts can be modified for submitting to other job
+queuing systems. Alternativly the scripts in the main `code` folder can be run
+individually.
 
 
 ### config.sh
@@ -61,4 +66,31 @@ of the fastq files and aligns them to the genome. It can be submitted to the
 queue like so:
 
     bsub < code/batch_bowtie2.sh
+
+### make_bed.sh
+
+This script: 
+
+1. Coverts the .bam alignment file into bed format
+2. Parses the reads
+3. Calls the `merge_pairs.pl` script to combined proper pairs into a single
+fragment
+4. Finds overlaps with the reference bed file containing the regions of interest
+(e.g. DUF1220)
+5. Calculates the average coverage for each region: (number of bases that
+overlap) / (domain length)
+
+### merge_pairs.pl
+
+This is a helper script to `make_bed.sh` that combines proper pairs into a
+single fragment, and separates discordant pairs into single end reads. The
+lengths of the single end reads are extended by half the mean fragment size,
+which is determined from the data itself. The extended length is sampled from a
+normal distribution using the mean and standard deviation of the measured fragment sizes.
+
+### gc_correction.R
+
+This script performs the GC correction step using conserved regions that are
+assumed to be found in diploid copy number.
+
 
