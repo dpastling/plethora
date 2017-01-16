@@ -4,7 +4,7 @@ genome=
 first_read=
 second_read=
 bam_file=
-max_insert=2000
+max_insert=1000
 
 while getopts g:b:i: opt; do
   case $opt in
