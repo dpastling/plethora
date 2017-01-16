@@ -11,12 +11,18 @@ if (!@ARGV)
 	exit;
 }
 
+# the inner distance is the distance between the reads
+# (insert size - (2 * read length))
+# the limit below is our criteria for considering a proper pair
+my $max_inner_distance = 600;
+
 random_set_seed_from_phrase(time);
 my @distance;
 foreach my $bed_file (@ARGV)
 {
 	next if ($bed_file !~ /\.bed$/);
-	
+
+	my $sufficient_number_of_reads = 50000000;
 	
 	## First we want to look at each proper pairs and determine the average distance between pairs
 	open(INFILE, $bed_file) or die "cannot open $bed_file";
@@ -32,7 +38,7 @@ foreach my $bed_file (@ARGV)
 			#next if ($d <= 0 || $d > 2500);
 			push(@distance, $d);
 		}
-		last if ($#distance > 50000000);
+		last if ($#distance > $sufficient_number_of_reads);
 	}
 	close(INFILE);
 	
@@ -59,6 +65,11 @@ foreach my $bed_file (@ARGV)
 	$sd_distance = sprintf("%.0f", $sd_distance);
 	undef(@distance);
 	
+	# now that we know the actual inner distance and SD for our sample
+	# set the max to five times the SD. This deals with bad alignments. 
+	# A large distance can double or triple the coverage in troublesome 
+	# regions with extra read ambiguity
+	$max_inner_distance = $mean_distance + (5 * $sd_distance);
 	
 	## Now that we have figured out the distances, look at the file again
 	## to parse the reads
@@ -121,7 +132,7 @@ sub isAProperPair
 	# check that the reads are on opposite strands
 	return(0) if ($line[8] eq $line[9]);
 	# check inner distance
-	return(0) if ($line[4] - $line[2] > 2500);
+	return(0) if ($line[4] - $line[2] > $max_inner_distance);
 	# let's consider overlapping reads as a proper pair
 	return(1) if (($line[1] >= $line[4] && $line[1] <= $line[5]) || ($line[2] >= $line[4] && $line[2] <= $line[5])); 
 	return(0) if ($line[1] > $line[4]);
