@@ -1,14 +1,15 @@
 
 # plethora
 
-Plethora is a tool kit for estimating copy number of highly duplicated regions.
-It was tailored specifically for the DUF1220 domain which is found in over 300
-copies in the human genome. However it could be applied to other high copy
-domains and segmental duplications. The details will be published in the
-forthcoming paper:
+Plethora is a tool kit for copy number variation (CNV) analysis of highly
+duplicated regions.  It was tailored specifically for the DUF1220 domain which
+is found in over 300 copies in the human genome. However it could be applied to
+other high copy domains and segmental duplications. The details will be
+published in the forthcoming paper:
 
 > Astling, DP, Heft IE, Jones, KL, Sikela, JM. "High resolution measurement of
-> DUF1220 domain copy number from whole genome sequence data"
+> DUF1220 domain copy number from whole genome sequence data" (2017) BMC
+> Genomics. under review
 
 ## Dependancies
 
@@ -21,6 +22,12 @@ bedtools may break plethora due to changes with the parameters
 
 You will also need to download the human genome hg38 and build a bowtie index
 for it. Instructions for doing this can be found on the bowtie website.
+
+
+## Quick Start
+
+- Run a test file
+- OR: download one of the 1000 Genomes files and process it
 
 ## Geting Started
 
