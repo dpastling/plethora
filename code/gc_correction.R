@@ -53,7 +53,9 @@ X <- mutate(X, k.gc = ifelse(is.na(k.gc), 1, k.gc))
 X <- mutate(X, corrected.coverage = log(coverage) * k.gc)
 X <- mutate(X, corrected.coverage = exp(corrected.coverage))
 
-haploid.coverage <- median(X[grep("^((baseline)|(uc))", X[["domain"]]), "corrected.coverage"]) / 2
+haploid.coverage <- filter(X, grepl("((baseline)|(uc))", domain)
+haploid.coverage <- haploid.coverage[["corrected.coverage"]]
+haploid.coverage <- median(haploid.coverage) /2
 
 X <- mutate(X, corrected.coverage = corrected.coverage / haploid.coverage)
 
