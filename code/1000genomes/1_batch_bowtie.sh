@@ -21,6 +21,6 @@ code/download_sample.pl $sample $sample_index
 first_pair=`find fastq/$sample -name '*_1.filt.fastq.gz'  | perl -pe 's/\n/,/g'`
 second_pair=`find fastq/$sample -name '*_2.filt.fastq.gz' | perl -pe 's/\n/,/g'`
 
-code/bowtie2 -i 800 -g $genome -b $alignment_dir/${sample}.bam $first_pair $second_pair
+code/bowtie2.sh -i 800 -g $genome -b $alignment_dir/${sample}.bam $first_pair $second_pair
 
 
