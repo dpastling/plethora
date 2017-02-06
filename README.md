@@ -11,7 +11,7 @@ published in the forthcoming paper:
 > DUF1220 domain copy number from whole genome sequence data" (2017) BMC
 > Genomics. under review
 
-## Dependancies
+## Dependencies
 
 Plethora depends on the following software. Note that updates to samtools and
 bedtools may break plethora due to changes with the parameters
@@ -29,14 +29,14 @@ for it. Instructions for doing this can be found on the bowtie website.
 - Run a test file
 - OR: download one of the 1000 Genomes files and process it
 
-## Geting Started
+## Getting Started
 
 Below is a description of the main scripts used for the pipeline. A set of
 scripts for applying this pipeline to data from the 1000 Genomes data can be
 found in the `code/1000genomes` folder. The scripts in this folder are for
 submitting jobs to the LSF job queuing system for parallelizing the processing
 of multiple samples. These scripts can be modified for submitting to other job
-queuing systems. Alternativly the scripts in the main `code` folder can be run
+queuing systems. Alternatively the scripts in the main `code` folder can be run
 individually.
 
 
@@ -52,8 +52,8 @@ Here are few important variables for the pipeline:
 - **master_ref** path to the bedfile with the DUF1220 coordinates, or other
   regions of interest
 - **alignment_dir** path to where the bowtie alignments will go
-- **result_folder** path to where the resulting converage files will be stored
-- **bowtie_params** addional parameters to be passed to bowtie2 that are
+- **result_folder** path to where the resulting coverage files will be stored
+- **bowtie_params** additional parameters to be passed to bowtie2 that are
   specific to the project
 
 ### download_fastq.pl
