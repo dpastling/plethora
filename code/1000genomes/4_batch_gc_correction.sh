@@ -16,6 +16,6 @@ sample=${SAMPLES[$(($LSB_JOBINDEX - 1))]}
 bed_file=$bed_dir/${sample}_read_depth.bed
 gc_model=data/hg38_duf_full_domains_v2.2_GC.txt
 
-Rscript code/gc_correction.R $sample $gc_model
+Rscript code/gc_correction.R $bed_file $gc_model
 
 
