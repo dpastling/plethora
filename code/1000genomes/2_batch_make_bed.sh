@@ -3,6 +3,7 @@
 #BSUB -e logs/coverage_%J.log
 #BSUB -o logs/coverage_%J.out
 #BSUB -R "select[mem>40] rusage[mem=40]"
+#BSUB -n 12
 #BSUB -q normal
 #BSUB -P Sikela
 
