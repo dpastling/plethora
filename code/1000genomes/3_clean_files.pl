@@ -24,15 +24,15 @@ if (!@ARGV || @ARGV > 1 || $help || ! ($fastq_folder || $align_folder || $bed_fo
 {
 	print "$0:  clean up intermediate files after converting alignment to .bed format\n";
 	print "\n";
-	print "By default it assumes that the number of reads in the fastq file is";
-	print "correct (verified via checksum or read counting). Optionally you can provide a";
-	print "file with the expected number of reads. The script deletes the file from a";
-	print "prior step if the file in the next step has the correct number of reads (e.g.";
-	print "deleted the original bam file if the sorted bam has the correct number of";
-	print "reads).";
+	print "By default it assumes that the number of reads in the fastq file is\n";
+	print "correct (verified via checksum or read counting). Optionally you can provide a\n";
+	print "file with the expected number of reads. The script deletes the file from a\n";
+	print "prior step if the file in the next step has the correct number of reads (e.g.\n";
+	print "deleted the original bam file if the sorted bam has the correct number of\n";
+	print "reads).\n";
 	print "\n";
-	print "If files have been downloaded from a public repository like the 1000 Genomes,";
-	print "this script can remove the fastq files by passing an optional flag.";
+	print "If files have been downloaded from a public repository like the 1000 Genomes,\n";
+	print "this script can remove the fastq files by passing an optional flag.\n";
 	print "\n";
 	print "assume bam contains unaligned reads\n";
 	print "--------------------------------------------------\n";
@@ -45,7 +45,7 @@ if (!@ARGV || @ARGV > 1 || $help || ! ($fastq_folder || $align_folder || $bed_fo
 	print "    -d/rm_fastq             remove fastq files               default: keep fastq files\n";
 	print "    -m/manifest <filename>  sequence_index file from         default: none\n";
 	print "                            the 1000 Genomes project\n";
-	print "    -h         print this help message and quit\n";
+	print "    -h                      print this help message and quit\n";
 	print "\n";
 	exit;
 }
