@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 # This script downloads the fastq files for a given sample. 
 # The user needs to supply the sample name and the sequence_index file
@@ -13,7 +13,6 @@ if (!@ARGV)
 }
 my $sample = $ARGV[0];
 my $sequence_index_file = $ARGV[1];
-my $ftp_address = "ftp://ftp-trace.ncbi.nih.gov/1000genomes/ftp/phase3";
 
 my $exit_status;
 if (! -d "fastq") { system("mkdir fastq"); } 
@@ -33,11 +32,11 @@ while(<FASTQ>)
 
 	# TODO: delete old file if it exists
 
-	$exit_status = system("cd fastq/$sample; wget --no-verbose $ftp_address/$file_path");
+	$exit_status = system("cd fastq/$sample; wget --no-verbose $file_path");
 
 	if ($exit_status != 0)
 	{
-		warn "problem downloading $ftp_address/$file_path\n";
+		warn "problem downloading $file_path\n";
 		warn "Exiting...";
 		exit 1;
 	}
