@@ -52,7 +52,7 @@ while(<FASTQ>)
 	{
 		warn "Invaid checksum for $file_path\n";
 		warn "should be $checksum_ideal, but is $file_checksum\n";
-#		exit 1;
+		exit 1;
 	} else {
 		print "checksum valid for $file_path\n";
 	}
