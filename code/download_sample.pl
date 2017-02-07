@@ -30,7 +30,10 @@ while(<FASTQ>)
 	$file =~ s/^.+?\/([^\/]+)$/$1/;
 	my $checksum_ideal  = $attributes[1];
 
-	# TODO: delete old file if it exists
+	if (-e fastq/$sample/$file)
+	{
+		system("rm fastq/$sample/$file");
+	}
 
 	$exit_status = system("cd fastq/$sample; wget --no-verbose $file_path");
 
