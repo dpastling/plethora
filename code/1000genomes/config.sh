@@ -16,6 +16,9 @@ fi
 if [[ ! -d $bed_dir ]]; then
         mkdir -p $bed_dir
 fi
+if [[ ! -d logs ]]; then
+        mkdir logs
+fi
 
 
 SAMPLES=(
