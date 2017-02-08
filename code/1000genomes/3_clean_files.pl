@@ -81,10 +81,10 @@ if ($manifest)
 		my $file = $file_path;
 		$file =~ s/^.+?\/([^\/]+)$/$1/;
 		$file = "fastq/$sample_name/$file";
-		if ($file =~ /_1.filt.fastq.gz/)
+		if ($file =~ /_1(.filt)*.fastq.gz/)
 		{
 			push @first_pair, $file;
-		} elsif ($file =~ /_2.filt.fastq.gz/)
+		} elsif ($file =~ /_2(.filt)*.fastq.gz/)
 		{
 			push @second_pair, $file;
 		} else 
@@ -117,7 +117,7 @@ if ($fastq_folder)
 	foreach my $file (@fastq_files)
 	{
 		$fastq_count += count_fastq($file);
-		if ($file =~ /_2.filt.fastq.*/)
+		if ($file =~ /_2((.filt)|(_filtered))*.fastq.*/)
 		{
 			$pairing = "paired";
 		} else
