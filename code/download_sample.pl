@@ -13,12 +13,18 @@ if (!@ARGV)
 }
 my $sample = $ARGV[0];
 my $sequence_index_file = $ARGV[1];
+my $max_tries = 10;
 
 my $exit_status;
 if (! -d "fastq") { system("mkdir fastq"); } 
 if (! -d "fastq/$sample") { system("mkdir fastq/$sample"); }
-open(FASTQ, $sequence_index_file) or die "cannot open the needed sequence index file: $sequence_index_file";
-while(<FASTQ>)
+
+my @fastq_files;
+my @checksums;
+my @read_counts;
+
+open(METADATA, $sequence_index_file) or die "cannot open the needed sequence index file: $sequence_index_file";
+while(<METADATA>)
 {
 	my $line = $_;
 	chomp $line;
@@ -30,10 +36,17 @@ while(<FASTQ>)
 	$file =~ s/^.+?\/([^\/]+)$/$1/;
 	my $checksum_ideal  = $attributes[1];
 
+}
+close(<METADATA>);
+
+my $number_of_tries = 0;
+for (my $i = 0; $i <= $#fastq_files; $i++)
+{
+	my $file = $fastq_files[$i];
 	if (-e "fastq/$sample/$file")
 	{
-		my $file_checksum = `md5sum fastq/$sample/$file`;
-		next if ($file_checksum eq $checksum_ideal);
+		my $actual_checksum = `md5sum fastq/$sample/$file`;
+		next if ($actual_checksum eq $checksums[$i]);
 		system("rm fastq/$sample/$file");
 	}
 
@@ -41,18 +54,27 @@ while(<FASTQ>)
 
 	if ($exit_status != 0)
 	{
-		warn "problem downloading $file_path\n";
-		warn "Exiting...";
-		exit 1;
+		$number_of_tries++;
+		if ($number_of_tries >= $max_tries)
+		{
+			warn "problem downloading $file_path\n";
+			warn "exceeded maximum number of tries: $max_tries\n"
+			warn "Exiting...";
+			exit 1;
+		}
+		$i = $i - 1;
+		# remove any partially downloaded files
+		# wget adds a digit to the end of the file if multiple attempts are made
+		system("rm fastq/$sample/$file*");
+		next;
 	}
 	my $file_checksum = `md5sum fastq/$sample/$file`;
 	chomp $file_checksum;
 	$file_checksum =~ s/^([^ ]+?) (.+?)$/$1/;
 
-	# For some reason the number of reads and the checksum do not match
-	# what is listed in the sequence.index file (as of Sept 21, 2016)
-	# We will disable the exit of the download script for now, but still
-	# report an error when these discrepancies occur
+	# sometimes the checksum in the sequence.index file does not match the actual
+	# checksum. This may be due to an out of date index file. If this is the case
+	# comment out the exit line below.
 	if ($file_checksum ne $checksum_ideal)
 	{
 		warn "Invaid checksum for $file_path\n";
@@ -62,6 +84,5 @@ while(<FASTQ>)
 		print "checksum valid for $file_path\n";
 	}
 }
-close(FASTQ);
 
 
