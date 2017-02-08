@@ -30,8 +30,10 @@ while(<FASTQ>)
 	$file =~ s/^.+?\/([^\/]+)$/$1/;
 	my $checksum_ideal  = $attributes[1];
 
-	if (-e fastq/$sample/$file)
+	if (-e "fastq/$sample/$file")
 	{
+		my $file_checksum = `md5sum fastq/$sample/$file`;
+		next if ($file_checksum eq $checksum_ideal);
 		system("rm fastq/$sample/$file");
 	}
 
