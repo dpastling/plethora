@@ -16,7 +16,7 @@ GetOptions (    "h|help"	   => \$help,
 				"f|fastq=s"    => \$fastq_folder,
 				"a|align=s"    => \$align_folder,
 				"b|bed=s"      => \$bed_folder,
-				"d|rm_fastq"   => \$delete_fastq,
+				"d|rm-fastq"   => \$delete_fastq,
 				"m|manifest=s" => \$manifest
            );
 
@@ -42,7 +42,7 @@ if (!@ARGV || @ARGV > 1 || $help || ! ($fastq_folder || $align_folder || $bed_fo
 	print "    -f/fastq <path>         path to .fastq files             default: ./fastq\n";
 	print "    -a/align <path>         path to .bam files               default: ./alignments\n";
 	print "    -b/bed <path>           path to .bed files               default: ./results\n";
-	print "    -d/rm_fastq             remove fastq files               default: keep fastq files\n";
+	print "    -d/rm-fastq             remove fastq files               default: keep fastq files\n";
 	print "    -m/manifest <filename>  sequence_index file from         default: none\n";
 	print "                            the 1000 Genomes project\n";
 	print "    -h                      print this help message and quit\n";
@@ -155,6 +155,7 @@ if ($align_folder && -f $bam_file)
 	{
 		foreach my $file (@fastq_files)
 		{
+			print join("\t", "correct number of reads for:", $sample_name, "bam", "removing:", "fastq") . "\n";
 			system("rm $file");
 		}
 	}
@@ -174,6 +175,7 @@ if ($align_folder && -f $sorted_bam_file)
 	}
 	if (-f "$bam_file" && $sorted_align_count == $expected_number_of_reads)
 	{
+		print join("\t", "correct number of reads for:", $sample_name, "sorted bam", "removing:", "bam") . "\n";
 		system("rm $bam_file");
 	}
 }
@@ -213,15 +215,18 @@ if ($bed_folder && -f $bed_file)
 	{
 		foreach my $file (@fastq_files)
 		{
+			print join("\t", "correct number of reads for:", $sample_name, "bed", "removing:", "fastq") . "\n";
 			system("rm $file") if (-f $file);
 		}
 	}
 	if (-f $bam_file && $bed_count == $expected_number_of_reads)
 	{
+		print join("\t", "correct number of reads for:", $sample_name, "bed", "removing:", "bam") . "\n";
 		system("rm $bam_file");
 	}
 	if (-f $sorted_bam_file && $bed_count == $expected_number_of_reads)
 	{
+		print join("\t", "correct number of reads for:", $sample_name, "bed", "removing:", "sorted bam") . "\n";
 		system("rm $sorted_bam_file");
 	}
 }
