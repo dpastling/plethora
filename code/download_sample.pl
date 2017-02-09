@@ -73,23 +73,52 @@ for (my $i = 0; $i <= $#fastq_files; $i++)
 		# remove any partially downloaded files
 		# wget adds a digit to the end of the file if multiple attempts are made
 		system("rm fastq/$sample/$file*");
+		warn "retrying...\n";
 		next;
 	}
+
+	# if multiple attempts have been made, wget will add a digit to the end of the 
+	# file. We can save some download time by renaming the file with the highest digit.
+	# If the file download is incomplete, it will be caught with the checksum below 
+	if (-e "fastq/$sample/$file.1")
+	{
+	        my @retries = glob "fastq/$sample/$file.[1-9]*";
+	        for (my $j = 0; $j <= $#retries; $j++)
+	        {
+	                $retries[$j] =~ s/fastq\/$sample\/$file\.//;
+	        }
+	        @retries = sort { $a <=> $b} @retries;
+	        system("mv fastq/$sample/$file.$retries[$#retries] fastq/$sample/$file");
+	        system("rm fastq/$sample/$file.[1-9]*");
+	}
+
 	my $file_checksum = `md5sum fastq/$sample/$file`;
 	chomp $file_checksum;
 	$file_checksum =~ s/^([^ ]+?) (.+?)$/$1/;
 
 	# sometimes the checksum in the sequence.index file does not match the actual
-	# checksum. This may be due to an out of date index file. If this is the case
-	# comment out the exit line below.
-	if ($file_checksum ne $checksum_ideal)
+	# checksum. The metadata may be out of date. If this is the case comment out 
+	# the section below or check the number of reads.
+	if ($file_checksum ne $checksums[$i])
 	{
-		warn "Invaid checksum for $file_path\n";
-		warn "should be $checksum_ideal, but is $file_checksum\n";
-		exit 1;
+		warn "Invaid checksum for $sample/$file\n";
+		warn "should be $checksums[$i], but is $file_checksum\n";
+		$number_of_tries++;
+		if ($number_of_tries >= $max_tries)
+		{
+			warn "exceeded maximum number of tries: $max_tries\n";
+			warn "Exiting...";
+			exit 1;
+		}
+		$i = $i - 1;
+		# remove any partially downloaded files
+		# wget adds a digit to the end of the file if multiple attempts are made
+		system("rm fastq/$sample/$file*");
+		next;
 	} else {
-		print "checksum valid for $file_path\n";
+		print "checksum valid for $sample/$file\n";
 	}
+	$number_of_tries = 0;
 }
 
 
