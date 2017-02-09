@@ -15,7 +15,14 @@ source code/1000genomes/config.sh
 # LSB_JOBINDEX is the job array position
 sample=${SAMPLES[$(($LSB_JOBINDEX - 1))]}
 
-code/download_sample.pl $sample $sample_index
+# check that all files have been trimmed
+ideal_files=`grep $sample $sample_index | wc -l`
+actual_files=`ls fastq/$sample/*_[12]_filtered.fastq.gz | wc -l`
+if [ $ideal_files != $actual_files ]
+then
+    echo "trimming is not complete for sample $sample"
+    exit 1
+fi
 
 # Bowtie requires that the file names be concatenated with a comma
 first_pair=`find fastq/$sample -name '*_1.filt.fastq.gz'  | perl -pe 's/\n/,/g'`
