@@ -19,6 +19,7 @@ my $exit_status;
 if (! -d "fastq") { system("mkdir fastq"); } 
 if (! -d "fastq/$sample") { system("mkdir fastq/$sample"); }
 
+my @ftp_path;
 my @fastq_files;
 my @checksums;
 my @read_counts;
@@ -29,15 +30,17 @@ while(<METADATA>)
 	my $line = $_;
 	chomp $line;
 	my @attributes = split('\t', $line);
+	# TODO: read in first line and figure out proper column indicies
 	next if ($attributes[0] eq "FASTQ_FILE");
 	next if ($attributes[9] ne $sample);
-	my $file_path = $attributes[0];
-	my $file = $file_path;
+	push @ftp_path, $attributes[0];
+	my $file = $attributes[0];
 	$file =~ s/^.+?\/([^\/]+)$/$1/;
-	my $checksum_ideal  = $attributes[1];
-
+	push @fastq_files, $file;
+	push @checksums, $attributes[1];
+	push @read_counts, $attributes[25];
 }
-close(<METADATA>);
+close(METADATA);
 
 my $number_of_tries = 0;
 for (my $i = 0; $i <= $#fastq_files; $i++)
@@ -46,19 +49,23 @@ for (my $i = 0; $i <= $#fastq_files; $i++)
 	if (-e "fastq/$sample/$file")
 	{
 		my $actual_checksum = `md5sum fastq/$sample/$file`;
-		next if ($actual_checksum eq $checksums[$i]);
+		if ($actual_checksum eq $checksums[$i])
+		{
+			print "checksum valid for $sample/$file\n";
+			next;
+		}
 		system("rm fastq/$sample/$file");
 	}
 
-	$exit_status = system("cd fastq/$sample; wget --no-verbose $file_path");
+	$exit_status = system("cd fastq/$sample; wget --no-verbose $ftp_path[$i]");
 
 	if ($exit_status != 0)
 	{
+		warn "problem downloading $sample/$file\n";
 		$number_of_tries++;
 		if ($number_of_tries >= $max_tries)
 		{
-			warn "problem downloading $file_path\n";
-			warn "exceeded maximum number of tries: $max_tries\n"
+			warn "exceeded maximum number of tries: $max_tries\n";
 			warn "Exiting...";
 			exit 1;
 		}
