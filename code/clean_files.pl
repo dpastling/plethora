@@ -60,7 +60,7 @@ my $pairing;
 
 # We assume the files follow this naming convention
 my $bam_file        = "$align_folder/$sample_name.bam";
-my $sorted_bam_file = "$align_folder/$sample_name\_sorted.bam";
+my $sorted_bam_file = "$bed_folder/$sample_name\_sorted.bam";
 my $bed_file        = "$bed_folder/$sample_name.bed";
 
 
@@ -153,9 +153,9 @@ if ($align_folder && -f $bam_file)
 	}
 	if ($delete_fastq && $align_count == $expected_number_of_reads)
 	{
+		print join("\t", "correct number of reads for:", $sample_name, "bam", "removing:", "fastq") . "\n";
 		foreach my $file (@fastq_files)
 		{
-			print join("\t", "correct number of reads for:", $sample_name, "bam", "removing:", "fastq") . "\n";
 			system("rm $file");
 		}
 	}
@@ -213,9 +213,9 @@ if ($bed_folder && -f $bed_file)
 	}
 	if ($delete_fastq && @fastq_files && $bed_count == $expected_number_of_reads)
 	{
+		print join("\t", "correct number of reads for:", $sample_name, "bed", "removing:", "fastq") . "\n";
 		foreach my $file (@fastq_files)
 		{
-			print join("\t", "correct number of reads for:", $sample_name, "bed", "removing:", "fastq") . "\n";
 			system("rm $file") if (-f $file);
 		}
 	}
