@@ -229,6 +229,11 @@ if ($bed_folder && -f $bed_file)
 		print join("\t", "correct number of reads for:", $sample_name, "bed", "removing:", "sorted bam") . "\n";
 		system("rm $sorted_bam_file");
 	}
+	# don't need the original bed file if it passes QC and we have the final results
+	if ($bed_count == $expected_number_of_reads && -f "$bed_folder/$sample_name\_sorted.bed")
+	{
+		system("rm $bed_file");
+	}
 }
 
 
