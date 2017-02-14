@@ -49,6 +49,7 @@ for (my $i = 0; $i <= $#fastq_files; $i++)
 	if (-e "fastq/$sample/$file")
 	{
 		my $actual_checksum = `md5sum fastq/$sample/$file`;
+		$actual_checksum = (split / /, $actual_checksum)[0];
 		if ($actual_checksum eq $checksums[$i])
 		{
 			print "checksum valid for $sample/$file\n";
@@ -93,8 +94,7 @@ for (my $i = 0; $i <= $#fastq_files; $i++)
 	}
 
 	my $file_checksum = `md5sum fastq/$sample/$file`;
-	chomp $file_checksum;
-	$file_checksum =~ s/^([^ ]+?) (.+?)$/$1/;
+	$file_checksum = (split / /, $file_checksum)[0];
 
 	# sometimes the checksum in the sequence.index file does not match the actual
 	# checksum. The metadata may be out of date. If this is the case comment out 
