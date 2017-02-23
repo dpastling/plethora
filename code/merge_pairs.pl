@@ -14,7 +14,7 @@ if (!@ARGV)
 # the inner distance is the distance between the reads
 # (insert size - (2 * read length))
 # the limit below is our criteria for considering a proper pair
-my $max_inner_distance = 600;
+my $max_inner_distance = 800;
 
 random_set_seed_from_phrase(time);
 my @distance;
