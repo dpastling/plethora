@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#BSUB -J gc_correct[1-300]%5
+#BSUB -J gc_correct[1-300]
 #BSUB -o logs/gc_correction.out
 #BSUB -e logs/gc_correction.err
 #BSUB -R "select[mem>10] rusage[mem=10]"

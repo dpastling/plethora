@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#BSUB -J clean[104,110,112,113,118-121,124-128,130,131]%5
+#BSUB -J clean[1-300]
 #BSUB -e logs/clean_%J.log
 #BSUB -o logs/clean_%J.out
 #BSUB -R "select[mem>5] rusage[mem=5] span[hosts=1]"
@@ -14,6 +14,8 @@ source code/1000genomes/config.sh
 
 # LSB_JOBINDEX is the job array position
 sample=${SAMPLES[$(($LSB_JOBINDEX - 1))]}
+
+Rscript trim_analysis.R
 
 code/clean_files.pl --rm-fastq $sample
 

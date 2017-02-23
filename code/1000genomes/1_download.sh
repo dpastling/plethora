@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#BSUB -J download[13-14]%5
+#BSUB -J download[1-300]%20
 #BSUB -e logs/download_%J.log
 #BSUB -o logs/download_%J.out
 #BSUB -R "select[mem>2] rusage[mem=2] span[hosts=1]"
