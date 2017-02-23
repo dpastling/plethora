@@ -2,7 +2,7 @@
 
 sample_index=data/1000Genomes_samples_20170101.txt
 genome=$HOME/genomes/bowtie2.2.5_indicies/hg38/hg38
-master_ref=data/hg38_duf_full_domains_v2.2.bed
+master_ref=data/hg38_duf_full_domains_v2.3.bed
 
 # any additional parameters to be passed to bowtie should go here
 bowtie_params=""
