@@ -25,8 +25,8 @@ then
 fi
 
 # Bowtie requires that the file names be concatenated with a comma
-first_pair=`find fastq/$sample -name '*_1.filt.fastq.gz'  | perl -pe 's/\n/,/g'`
-second_pair=`find fastq/$sample -name '*_2.filt.fastq.gz' | perl -pe 's/\n/,/g'`
+first_pair=`find fastq/$sample -name '*_1.filtered.fastq.gz'  | perl -pe 's/\n/,/g'`
+second_pair=`find fastq/$sample -name '*_2.filtered.fastq.gz' | perl -pe 's/\n/,/g'`
 
 code/bowtie2.sh -i 800 -g $genome -b $alignment_dir/${sample}.bam $first_pair $second_pair
 
