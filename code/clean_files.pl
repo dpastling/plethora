@@ -63,6 +63,17 @@ my $bam_file        = "$align_folder/$sample_name.bam";
 my $sorted_bam_file = "$bed_folder/$sample_name\_sorted.bam";
 my $bed_file        = "$bed_folder/$sample_name.bed";
 
+my $test_fastq      = defined(glob "$fastq_folder/$sample_name/*.fastq.gz");
+my $test_bam        = defined(-f $bam_file);
+my $test_sorted_bam = defined(-f $sorted_bam_file);
+my $test_bed        = defined(-f $bed_file);
+
+my $number_of_steps_to_process = $test_fastq + $test_bam + $test_sorted_bam + $test_bed;
+if ($number_of_steps_to_process < 2)
+{
+	print "nothing to be done for sample $sample_name\n";
+	exit;
+}
 
 my @first_pair;
 my @second_pair;
