@@ -53,7 +53,4 @@ awk 'OFS="\t" { print $1, $4 / ($3 - $2 + 1)}' ${output}_coverage.bed > ${output
 rm ${output}_edited.bed
 rm ${output}_temp.bed
 
-n_align=`cut -f 4 ${output}_sorted.bed | sort -T ./ | uniq | wc -l`
-echo $sample $n_align >> align_report.txt
-gzip ${output}_sorted.bed
 
