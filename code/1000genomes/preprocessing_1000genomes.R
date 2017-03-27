@@ -40,6 +40,9 @@ dna.samples     <- dna.samples[[1]]
 irys.samples    <- read.delim("data/rd-irys-samples.txt", header = FALSE)
 irys.samples    <- irys.samples[[1]]
 
+failed.samples  <- read.delim("data/failed_samples.txt", header = FALSE)
+failed.samples  <- failed.samples[[1]]
+
 ################################################################
 # Cleanup
 ################################################################
@@ -85,8 +88,6 @@ subpar.irys <- filter(sequence.index,
 
 # for samples with insert.size of zero, impute with mean insert size for that center (there are seven samples like this from WUGSC)
 
-# 10x coverage is 100 million reads for 300bp fragments
-sample.stats <- filter(sample.stats, n.reads >= 100e6, n.reads < 400e6)
 
 # Some samples were sequenced independantly by multiple centers
 # give priority to c("BGI", "SC", "ILLUMINA", "MPIMG", "WUGSC")
@@ -109,10 +110,6 @@ sample.stats <- group_by(sample.stats, SAMPLE_NAME) %>%
                 filter(file.rank == 1) %>%
                 ungroup()
 
-sequence.index <- filter(sequence.index, 
-    paste(SAMPLE_NAME, CENTER_NAME, LIBRARY_NAME) %in% 
-    paste(sample.stats[["SAMPLE_NAME"]], sample.stats[["CENTER_NAME"]],
-    sample.stats[["LIBRARY_NAME"]]))
 
 ################################################################
 # Narrow list
@@ -132,6 +129,23 @@ samples.of.interest     <- c(sudmant.samples, dna.samples, irys.samples)
 populations.of.interest <- c("MXL", "CLM", "PUR", "ASW", "LWK", "YRI", 
                              "JPT", "CHB", "CHS", "TSI", "CEU", "IBS", 
                              "FIN", "GBR")
+
+# 10x coverage is 100 million reads for 300bp fragments
+#sample.stats <- filter(sample.stats, n.reads >= 100e6, n.reads < 400e6)
+sample.stats <- mutate(sample.stats, coverage = (n.reads * mean.insert.size) / 3.235e9)
+# we want the unfiltered coverage to be 12 so allow for up to 10% of the reads to be trimmed
+sample.stats <- filter(sample.stats, coverage >= 12, n.reads >= 90e6, n.reads < 400e6)
+sample.stats <- filter(sample.stats, ! SAMPLE_NAME %in% failed.samples)
+
+
+
+
+sample.stats <- filter(sample.stats, ! SAMPLE_NAME %in% failed.samples)
+
+sequence.index <- filter(sequence.index, 
+    paste(SAMPLE_NAME, CENTER_NAME, LIBRARY_NAME) %in% 
+    paste(sample.stats[["SAMPLE_NAME"]], sample.stats[["CENTER_NAME"]],
+    sample.stats[["LIBRARY_NAME"]]))
 
 
 desired.samples <- filter(sequence.index, SAMPLE_NAME %in% samples.of.interest )
@@ -184,6 +198,6 @@ for (p in unique(sample.stats[["pop"]]))
     desired.samples <- bind_rows(desired.samples, X)
 }
 
-write.table(desired.samples, file = "data/1000Genomes_samples_20170101.txt", sep = "\t", quote = FALSE, row.names = FALSE)
+write.table(desired.samples, file = "data/1000Genomes_samples_20170318.txt", sep = "\t", quote = FALSE, row.names = FALSE)
 
 
