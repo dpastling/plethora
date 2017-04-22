@@ -15,7 +15,7 @@ source code/1000genomes/config.sh
 # LSB_JOBINDEX is the job array position
 sample=${SAMPLES[$(($LSB_JOBINDEX - 1))]}
 
-Rscript trim_analysis.R
+Rscript code/1000genomes/trim_qc_report.R
 
 code/clean_files.pl --rm-fastq $sample
 
