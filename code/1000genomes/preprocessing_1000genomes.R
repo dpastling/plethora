@@ -25,6 +25,11 @@ sequence.index <- fread(
 	colClasses = "character"
 	)
 
+# ignore samples that have failed QC in the past
+failed.samples  <- read.delim("data/failed_samples.txt", header = FALSE)
+failed.samples  <- failed.samples[[1]]
+
+
 # The following are the samples processed in:
 # Sudmant, P. H., et al. (2010). Diversity of human copy number variation
 # and multicopy genes. Science, 330(6004), 641–646.
@@ -76,17 +81,14 @@ sample.stats <- sequence.index %>%
                 ) %>%
                 ungroup()
 
-subpar.irys <- filter(sample.stats, 
-	                  SAMPLE_NAME %in% irys.samples,
-					  n.reads < 100e6,
-					  n.reads > 85e6
-					  )
-subpar.irys <- filter(sequence.index, 
-	paste(SAMPLE_NAME, CENTER_NAME, LIBRARY_NAME) %in% 
-    paste(subpar.irys[["SAMPLE_NAME"]], subpar.irys[["CENTER_NAME"]],
-    subpar.irys[["LIBRARY_NAME"]]))
 
 # for samples with insert.size of zero, impute with mean insert size for that center (there are seven samples like this from WUGSC)
+
+# 10x coverage is 100 million reads for an insert size of 300bp
+# the size of the human genome is 3.235e9 bp
+sample.stats <- mutate(sample.stats, coverage = (n.reads * mean.insert.size) / 3.235e9)
+sample.stats <- filter(sample.stats, coverage > 10, n.reads < 400e6)
+sample.stats <- filter(sample.stats, ! SAMPLE_NAME %in% failed.samples)
 
 
 # Some samples were sequenced independantly by multiple centers
@@ -198,6 +200,8 @@ for (p in unique(sample.stats[["pop"]]))
     desired.samples <- bind_rows(desired.samples, X)
 }
 
-write.table(desired.samples, file = "data/1000Genomes_samples_20170318.txt", sep = "\t", quote = FALSE, row.names = FALSE)
+date.stamp <- as.Date(Sys.time())
+
+write.table(desired.samples, file = paste0("data/1000Genomes_samples_", date.stamp ,".txt", sep = "\t", quote = FALSE, row.names = FALSE)
 
 
