@@ -5,14 +5,35 @@ library(dplyr)
 library(tidyr)
 
 # load data
-sequence.index <- read.delim("data/1000Genomes_samples_20170101.txt")
+sequence.index <- read.delim("data/1000Genomes_samples_combined.txt")
 trim.stats     <- read.delim("logs/trim_stats.txt", header = FALSE)
 config_samples <- readLines("code/1000genomes/config.sh")
+align.report   <- read.delim("align_report.txt", header = FALSE, sep = " ")
+
 
 # tidy data
 colnames(trim.stats) <- c("file", "type", "read.count")
-trim.stats <- mutate(trim.stats, file = gsub("^fastq/", "", file))
-trim.stats <- separate(trim.stats, file, c("SAMPLE_NAME", "FASTQ_FILE"), sep = "/")
+
+colnames(align.report) <- c("SAMPLE_NAME", "aligned.fragments")
+align.report <- mutate(align.report, SAMPLE_NAME = gsub("_sorted.bed", "", SAMPLE_NAME))
+
+system('grep "correct number of reads" logs/clean_*.out | uniq > clean_report.txt')
+clean.report   <- read.delim("clean_report.txt", header = FALSE)
+clean.report   <- clean.report[, c(2,3)]
+colnames(clean.report) <- c("SAMPLE_NAME", "file.type")
+
+# duplicate entries are possible if the trim script failed and had to be rerun
+# for these duplicates, take the most recent stats (largest row number)
+trim.stats <- trim.stats %>% 
+  mutate(row = 1:nrow(trim.stats)) %>%
+  arrange(desc(row)) %>%
+  filter(! duplicated(paste(file, type))) %>%
+  arrange(row) %>%
+  select(-row)
+
+trim.stats <- trim.stats %>%
+  mutate(file = gsub("^fastq/", "", file)) %>%
+  separate(file, c("SAMPLE_NAME", "FASTQ_FILE"), sep = "/")
 
 sequence.index <- mutate(sequence.index, FASTQ_FILE = gsub("^.+?/([^/]+.fastq.gz)$", "\\1", FASTQ_FILE))
 
@@ -21,7 +42,6 @@ config_samples <- config_samples[(grep("SAMPLES", config_samples) + 1):length(co
 config_samples <- config_samples[1:(min(which(config_samples == ")")) - 1)]
 config_samples <- data.frame(index = 1:length(config_samples), SAMPLE_NAME = config_samples)
 
-# TODO: remove duplicates from the trim.stats
 
 # checks to perform:
 #    - does the downloaded file have the correct number of reads?
@@ -46,18 +66,22 @@ trim.summary <- trim.stats %>%
 			  percent.filtered = filtered.reads / total.reads,
 			  remaining.reads = total.reads - filtered.reads
 		  )
- 
 
 meta.summary <- sequence.index %>%
 			  group_by(SAMPLE_NAME, CENTER_NAME, POPULATION) %>%
 			  summarise(
 				  expected.reads = sum(READ_COUNT) / 2,
-				  expected.files = n() / 2
+				  expected.files = n() / 2,
+				  INSERT_SIZE = mean(INSERT_SIZE)
 			  ) %>%
-			  ungroup() %>%
-			  left_join(config_samples, by = "SAMPLE_NAME")
+			  ungroup()
+
+meta.summary <- left_join(meta.summary, config_samples, by = "SAMPLE_NAME")
 
 trim.summary <- left_join(trim.summary, meta.summary, by = "SAMPLE_NAME")
+
+align.report <- left_join(trim.summary, align.report, by = "SAMPLE_NAME")
+align.report <- mutate(align.report, percent.aligned = aligned.fragments / remaining.reads)
 
 flag.for.cleanup <- filter(trim.summary, n.files == expected.files, total.reads == expected.reads)
 
@@ -81,11 +105,8 @@ bed.files = unique(bed.files)
 # grep "correct number of reads" logs/clean_*.out | uniq > clean_report.txt
 # grep "something is wrong" logs/clean_*
 
-system('grep "correct number of reads" logs/clean_*.out | uniq > clean_report.txt')
 
-clean.report <- read.delim("clean_report.txt", header = FALSE)
-clean.report <- clean.report[, c(2,3)]
-colnames(clean.report) <- c("SAMPLE_NAME", "file.type")
+
 
 finished.bams <- filter(clean.report, file.type == "bam")
 finished.bams <- unique(finished.bams[["SAMPLE_NAME"]])
@@ -127,10 +148,12 @@ cleanup_old_files <- function(old.samples = flag.for.cleanup[["SAMPLE_NAME"]])
 
 
 
-
 cleanup_old_files()
 
 write.table(sample.stage, file = "sample_stages.txt", sep = "\t", quote = FALSE, row.names = FALSE)
 
 write.table(quality.problems, file = "quality_problems.txt", sep = "\t", quote = FALSE, row.names = FALSE)
+
+write.table(align.report, file = "sequence_report.txt", sep = "\t", quote = FALSE, row.names = FALSE)
+
 
