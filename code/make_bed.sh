@@ -43,7 +43,7 @@ else
 fi
 sort -k 1,1 -k 2,2n -T ./ ${output}_edited.bed > ${output}_sorted.bed
 bedtools intersect -wao -sorted -a $reference_bed -b ${output}_sorted.bed > ${output}_temp.bed
-awk 'OFS="\t" {print $4,$2,$3,$1,$13}' ${output}_temp.bed | bedtools merge -scores sum -i - > ${output}_coverage.bed
+awk 'OFS="\t" {print $4,$2,$3,$1,$13}' ${output}_temp.bed | bedtools merge -c 5 -o sum -i - > ${output}_coverage.bed
 awk 'OFS="\t" { print $1, $4 / ($3 - $2 + 1)}' ${output}_coverage.bed > ${output}_read_depth.bed
 # if [ -f $output.bed ]
 # then
