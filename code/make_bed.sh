@@ -30,7 +30,7 @@ set -o nounset -o pipefail -o errexit
 
 if [ "$pairing" == "paired" ]
 then
-    samtools sort -n -@ 12 -m 2G $bam ${output}_sorted
+    samtools sort -n -@ 12 -m 2G -o ${output}_sorted.bam $bam
     bedtools bamtobed -split -bedpe -i ${output}_sorted.bam > $output.bed
     rm ${output}_sorted.bam
     code/merge_pairs.pl $output.bed
