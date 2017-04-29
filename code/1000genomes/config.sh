@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-sample_index=ata/1000Genomes_samples.txt
+sample_index=data/1000Genomes_samples.txt
 genome=$HOME/genomes/bowtie2.2.5_indicies/hg38/hg38
 master_ref=data/hg38_duf_full_domains_v2.3.bed
 
