@@ -19,9 +19,12 @@ bedtools may break plethora due to changes with the parameters
 - bowtie2 version 2.2.9
 - bedtools version 2.17.0
 - samtools version: 0.1.19-44428cd
+- cutadapt v1.12
+- Perl module: Math::Random
+- Perl module: Math::Complex
 
 You will also need to download the human genome hg38 and build a bowtie index
-for it. Instructions for doing this can be found on the bowtie website.
+for it. Instructions for doing this can be found on the Bowtie2 website.
 
 
 ## Quick Start
