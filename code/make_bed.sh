@@ -30,7 +30,7 @@ set -o nounset -o pipefail -o errexit
 
 if [ "$pairing" == "paired" ]
 then
-    samtools sort -n -@ 12 -m 2G $bam ${output}_sorted
+    samtools sort -n -@ 12 -m 2G -o ${output}_sorted.bam $bam
     bedtools bamtobed -split -bedpe -i ${output}_sorted.bam > $output.bed
     rm ${output}_sorted.bam
     code/merge_pairs.pl $output.bed
@@ -43,7 +43,7 @@ else
 fi
 sort -k 1,1 -k 2,2n -T ./ ${output}_edited.bed > ${output}_sorted.bed
 bedtools intersect -wao -sorted -a $reference_bed -b ${output}_sorted.bed > ${output}_temp.bed
-awk 'OFS="\t" {print $4,$2,$3,$1,$13}' ${output}_temp.bed | bedtools merge -scores sum -i - > ${output}_coverage.bed
+awk 'OFS="\t" {print $4,$2,$3,$1,$13}' ${output}_temp.bed | bedtools merge -c 5 -o sum -i - > ${output}_coverage.bed
 awk 'OFS="\t" { print $1, $4 / ($3 - $2 + 1)}' ${output}_coverage.bed > ${output}_read_depth.bed
 # if [ -f $output.bed ]
 # then

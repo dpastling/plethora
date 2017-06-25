@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Math::Complex;
 use Math::Random;
+use Digest::MD5 qw(md5_hex);
 
 if (!@ARGV)
 {
@@ -16,7 +17,6 @@ if (!@ARGV)
 # the limit below is our criteria for considering a proper pair
 my $max_inner_distance = 800;
 
-random_set_seed_from_phrase(time);
 my @distance;
 foreach my $bed_file (@ARGV)
 {
@@ -94,6 +94,12 @@ foreach my $bed_file (@ARGV)
 		{
 			my @read1 = @elements[0..2,6..8];
 			my @read2 = @elements[3..7,9];
+
+			# seed the random number generator using a hash of the sequence data
+			# so that the inner distance calculate will be the same each time
+			my $eed = md5_hex($line);
+			random_set_seed_from_phrase($eed);
+
 			my $inner_distance = sprintf("%.0f", random_normal(1, $mean_distance, $sd_distance) / 2);
 			# there may be cases where the inner-distance is less than zero (read overlap)
 			# so don't bother trimming the read
