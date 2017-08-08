@@ -82,7 +82,7 @@ the other CON1 domains of NBPF1 or to NBPF1L.
 The results should look something like this
 
 ```bash
-awk '$?? > 0' results/???
+awk '$2 > 0' results/test_read_depth.bed
 ```
 
     NBPF1_CON1_1   28.2794
@@ -96,8 +96,8 @@ The following describes how to apply plethora to the 1000 Genomes data and
 describes the main steps in a little more detail. The scripts for processing the
 1000 Genomes data can be found in the `code/1000genomes` folder. These scripts
 are for submitting jobs to the LSF job queuing system for parallelizing the
-processing of multiple samples. These scripts can be modified for submitting to
-other job queuing systems such as PBS or Slurm. Alternatively the scripts in the main `code` folder
+processing of multiple samples. These scripts can be modified for use with 
+other job queuing systems (such as PBS or Slurm). Alternatively the scripts in the main `code` folder
 can be run individually without a job scheduler as described above.
 
 If everything has been configured correctly, you should be able to process the
@@ -105,12 +105,12 @@ entire dataset with the following command:
 
     bsub < code/1000genomes/run.sh
 
-However, it is likely that some jobs will fail at various stages due to
-networking issues or from heavy usage of your cluster. So you may have to submit
-some of the steps to the queue separately.
+However, it is likely that some jobs will fail at various stages of the pipeline due to
+networking issues or from heavy usage from other users of the computational cluster. 
+So you may have to submit some of these steps to the queue separately.
 
 
-0. config.sh
+0. **config.sh**
 
 The config file is where all the project specific parameters and sample names
 should go. The other scripts should be as abstract as possible for reuse. 
@@ -129,7 +129,7 @@ Here are few important variables for the pipeline:
 The config file will also create directories where all the results will go.
 
 
-1. 1\_download.sh
+1. **1\_download.sh**
 
 ```bash
 bsub < code/1000genomes/1_download.sh
@@ -146,16 +146,16 @@ code/download_fastq.pl HG00250 data/1000Genomes_samples.txt
 ```
 
 
-2.  2\_trim.sh
+2.  **2\_trim.sh**
 
 ```bash
 bsub < code/1000genomes/2_trim.sh
 ```
 
-This script automates the read trimming by Cutadapt. Cutadapt could be directly as described in the Quick Start guide above.
+This script automates the read trimming by Cutadapt. Alternativly, Cutadapt could be run directly as described in the Quick Start guide above.
 
 
-3. 3\_batch\_bowtie.sh
+3. **3\_batch\_bowtie.sh**
 
 ```bash
 bsub < code/1000genomes/3_batch_bowtie.sh
@@ -163,25 +163,25 @@ bsub < code/1000genomes/3_batch_bowtie.sh
 
 This script automates the Bowtie2 alignments for the filtered reads generated above.
 
-Alterativly, the 
+Alterativly, Bowtie2 can be run separately using the shell script `code/bowtie.sh` 
 
 
-### 4\_batch\_clean.sh
+4. **4\_batch\_clean.sh**
 
 ```bash
 bsub < code/1000genomes/4_batch_clean.sh
 ```
 
-This script removes intermediate files after the alignment or bed files are created. It first confirms that files from previous steps have been run correctly before removing them. 
+This script removes intermediate files after the later steps in the pipeline have completed. This is useful because the WGS files can take up a lot of disk space. This script first confirms that files from previous steps have been run correctly before removing them. 
 
-By default it assumes that the number of reads in the fastq file is
+By default it assumes that the number of reads in the fastq file are
 correct (verified via checksum or read counting). Optionally you can provide a
 file with the expected number of reads. The script deletes the file from a
 prior step if the file in the next step has the correct number of reads (e.g.
 deleted the original bam file if the sorted bam has the correct number of
 reads).
 
-If files have been downloaded from a public repository like the 1000 Genomes, this script can remove the fastq files by passing an optional flag.
+If the data have been downloaded from a public repository like the 1000 Genomes, this script can remove the fastq files by passing an optional flag.
 
 The script assumes the `.bam` file contains unaligned reads (e.g. the number of reads in the fastq file should match the number of reads in the .bam file).
 
@@ -192,7 +192,7 @@ code/clean_files.pl -h
 ```
 
 
-5.  5\_make\_bed.sh
+5.  **5\_make\_bed.sh**
 
 This script: 
 
@@ -206,21 +206,22 @@ fragment
 overlap) / (domain length)
 
 
-6. 6\_batch\_clean.sh
+6. **6\_batch\_clean.sh**
 
-This script is a link to the script above. At this stage it will remove the alignment and fastq files if present.
+This script is a link to the script above. At this stage it can remove the alignment and fastq files if present.
 
 
-7. 7\_batch\_gc\_correction.R
+7. **7\_batch\_gc\_correction.sh**
 
 ```bash
 bsub < code/1000genomes/7_batch_gc_correction.sh
 ```
 
 This script performs the GC correction step using conserved regions that are
-assumed to be found in diploid copy number. This script requires the `_read.depth.bed` file generated in step five above as well as a file with the percent GC content for each domain.
+assumed to be found in diploid copy number. This script requires the `_read.depth.bed` file 
+generated in step five above as well as a file with the percent GC content for each domain.
 
-Behind the scenes, the shell script calls `code/gc_correction.R` which can be run manually like so:
+Behind the scenes, this shell script calls `code/gc_correction.R` which can be run manually like so:
 
 ```bash
 code/gc_correction.R results/HG00250_read.depth.bed data/hg38_duf_full_domains_v2.3_GC.txt
