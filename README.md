@@ -212,6 +212,10 @@ overlap) / (domain length)
 
 #### 6. (Optional) Remove temporary files
 
+```bash
+bsub < code/1000genomes/6_batch_clean.sh
+```
+
 This script is a link to the script above. At this stage it can remove the alignment and fastq files if present.
 
 
