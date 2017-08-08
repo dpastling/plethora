@@ -9,7 +9,7 @@
 set -o nounset -o pipefail -o errexit -x
 
 bed=data/hg38_duf_canonical_v2.3.bed
-genome=$HOME/genomes/bowtie2.2.5_indicies/hg38/hg38.fa
+genome=$HOME/genomes/bowtie2.2.9_indicies/hg38/hg38.fa
 
 result=`echo $bed | sed 's/.bed//'`
 
