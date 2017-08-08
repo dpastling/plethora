@@ -110,12 +110,12 @@ networking issues or from heavy usage from other users of the computational clus
 So you may have to submit some of these steps to the queue separately.
 
 
-0. **config.sh**
+0. Edit the `config.sh` file to adapt the paths and sample list for your environment
 
 The config file is where all the project specific parameters and sample names
-should go. The other scripts should be as abstract as possible for reuse. 
+should go. The other scripts in the pipeline should be kept as abstract as possible for reuse. 
 
-Here are few important variables for the pipeline:
+Here are few important variables required by the pipeline:
 
 - **sample_index** path to the file with the 1000 Genomes information
 - **genome** path to the bowtie indices for genome
