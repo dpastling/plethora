@@ -36,34 +36,43 @@ The following illustrates the minimal steps necessary to run the pipeline. The s
 
 1. Create directories for the resulting files (if they don't exist already)
 
-    mkdir alignments
-    mkdir results
+```bash
+mkdir alignments
+mkdir results
+```
 
 2. Trim low quality bases from the 3' ends of the reads and remove any that are shorter than 80bp. Since we are working with simulated reads, we don't expect many reads to be effected by this.
 
-    cutadapt \
-    -a XXX -A XXX -q 10 --minimum-length 80 --trim-n \
-    -o fastq/test_1_filtered.fastq.gz \
-    -p fastq/test_2_filtered.fastq.gz \
-    fastq/test_1.fastq.gz \
-    fastq/test_2.fastq.gz
-
+```bash
+cutadapt \
+ -a XXX -A XXX -q 10 --minimum-length 80 --trim-n \
+ -o fastq/test_1_filtered.fastq.gz \
+ -p fastq/test_2_filtered.fastq.gz \
+ fastq/test_1.fastq.gz \
+ fastq/test_2.fastq.gz
+```
 
 3. Align reads to the genome with Bowtie2. Note you may have to change the path to point to your Bowtie2 reference
 
-    code/bowtie2.sh \
-    -g $HOME/genomes/bowtie2.2.9_indicies/hg38/hg38 \
-    -b alignments/test.bam \
-    fastq/test_1_filtered.fastq.gz \
-    fastq/test_2_filtered.fastq.gz
+
+```bash
+code/bowtie2.sh \
+ -g $HOME/genomes/bowtie2.2.9_indicies/hg38/hg38 \
+ -b alignments/test.bam \
+ fastq/test_1_filtered.fastq.gz \
+ fastq/test_2_filtered.fastq.gz
+```
 
 4. Calculate coverage for each DUF1220 domain
 
-    code/make_bed.sh \
-    -r data/hg38_duf_full_domains_v2.3.bed \
-    -p "paired" \
-    -b alignments/test.bam \
-    -o results/test
+
+```bash
+code/make_bed.sh \
+ -r data/hg38_duf_full_domains_v2.3.bed \
+ -p "paired" \
+ -b alignments/test.bam \
+ -o results/test
+```
 
 The resulting file ??? has the coverage for each domain. The reads were
 simulated from NBPF1\_CON1\_1 at 30x coverage. Bases on prior work, we expect to
