@@ -16,10 +16,10 @@ published in the forthcoming paper:
 Plethora depends on the following software. Note that updates to samtools and
 bedtools may break plethora due to recent parameter changes
 
-- bowtie2 version 2.2.9
-- bedtools version 2.17.0
-- samtools version: 0.1.19-44428cd
-- cutadapt v1.12
+- [Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml) version 2.2.9
+- [Bedtools](http://bedtools.readthedocs.io/en/latest/) version 2.17.0
+- [Samtools](http://samtools.sourceforge.net) version: 0.1.19-44428cd
+- [Cutadapt](https://cutadapt.readthedocs.io) v1.12
 - Perl module: Math::Random
 - Perl module: Math::Complex
 
@@ -74,22 +74,20 @@ code/make_bed.sh \
  -o results/test
 ```
 
-The resulting file ??? has the coverage for each domain. The reads were
+The resulting file `test_read_depth.bed` has the coverage for each domain. The reads were
 simulated from NBPF1\_CON1\_1 at 30x coverage. Bases on prior work, we expect to
 find that most reads align to NBPF1\_CON1\_1, but some reads will map to one of
 the other CON1 domains of NBPF1 or to NBPF1L.
 
-View the results:
+The results should look something like this
 
-    ls -ltr results
+```bash
+awk '$?? > 0' results/???
+```
 
-example output here
-
-    awk '$?? > 0' results/???
-
-example output here
-
-
+    NBPF1_CON1_1   28.2794
+    NBPF1L_CON1_1  2.55338
+    NBPF1_CON1_2   0.66548
 
 
 ## Processing sequence data from the 1000 Genomes Project
@@ -112,7 +110,7 @@ networking issues or from heavy usage of your cluster. So you may have to submit
 some of the steps to the queue separately.
 
 
-#### config.sh
+0. config.sh
 
 The config file is where all the project specific parameters and sample names
 should go. The other scripts should be as abstract as possible for reuse. 
@@ -131,9 +129,11 @@ Here are few important variables for the pipeline:
 The config file will also create directories where all the results will go.
 
 
-### 1\_download.sh
+1. 1\_download.sh
 
-    bsub < code/1000genomes/1_download.sh
+```bash
+bsub < code/1000genomes/1_download.sh
+```
 
 This script downloads the fastq files for each sample from the 1000
 Genomes site as specified in a sample\_index file. The script fetches all associated files with a given sample name and uses `wget` to download the files to the `fastq` folder. The script checks the md5sum hashes for each file against the
@@ -141,17 +141,25 @@ downloaded file. The script exits with an error if they do not match.
 
 Alternativly, if you are not using the LSF queuing system, the script can be run manually like so:
 
-    code/download_fastq.pl HG00250 data/1000Genomes_samples.txt 
+```bash
+code/download_fastq.pl HG00250 data/1000Genomes_samples.txt 
+```
 
-### 2\_trim.sh
 
-    bsub < code/1000genomes/2_trim.sh
+2.  2\_trim.sh
+
+```bash
+bsub < code/1000genomes/2_trim.sh
+```
 
 This script automates the read trimming by Cutadapt. Cutadapt could be directly as described in the Quick Start guide above.
 
-### 3\_batch\_bowtie.sh
 
-    bsub < code/1000genomes/3_batch_bowtie.sh
+3. 3\_batch\_bowtie.sh
+
+```bash
+bsub < code/1000genomes/3_batch_bowtie.sh
+```
 
 This script automates the Bowtie2 alignments for the filtered reads generated above.
 
@@ -160,7 +168,9 @@ Alterativly, the
 
 ### 4\_batch\_clean.sh
 
-    bsub < code/1000genomes/4_batch_clean.sh
+```bash
+bsub < code/1000genomes/4_batch_clean.sh
+```
 
 This script removes intermediate files after the alignment or bed files are created. It first confirms that files from previous steps have been run correctly before removing them. 
 
@@ -177,38 +187,44 @@ The script assumes the `.bam` file contains unaligned reads (e.g. the number of 
 
 Behind the scenes the clean script runs `code/clean_files.pl`. For more information on how to run this directly:
 
-    code/clean_files.pl -h
+```bash
+code/clean_files.pl -h
+```
 
 
-### 5\_make\_bed.sh
+5.  5\_make\_bed.sh
 
 This script: 
 
-1. Coverts the .bam alignment file into bed format
-2. Parses the reads
-3. Calls the `merge_pairs.pl` script (described below) to combined proper pairs into a single
+  - Coverts the .bam alignment file into bed format
+  - Parses the reads
+  - Calls the `merge_pairs.pl` script (described below) to combined proper pairs into a single
 fragment
-4. Finds overlaps with the reference bed file containing the regions of interest
+  - Finds overlaps with the reference bed file containing the regions of interest
 (e.g. DUF1220)
-5. Calculates the average coverage for each region: (number of bases that
+  - Calculates the average coverage for each region: (number of bases that
 overlap) / (domain length)
 
-### 6\_batch\_clean.sh
+
+6. 6\_batch\_clean.sh
 
 This script is a link to the script above. At this stage it will remove the alignment and fastq files if present.
 
 
-### 7\_batch\_gc\_correction.R
+7. 7\_batch\_gc\_correction.R
 
-    bsub < code/1000genomes/7_batch_gc_correction.sh
+```bash
+bsub < code/1000genomes/7_batch_gc_correction.sh
+```
 
 This script performs the GC correction step using conserved regions that are
 assumed to be found in diploid copy number. This script requires the `_read.depth.bed` file generated in step five above as well as a file with the percent GC content for each domain.
 
 Behind the scenes, the shell script calls `code/gc_correction.R` which can be run manually like so:
 
-    code/gc_correction.R results/HG00250_read.depth.bed data/hg38_duf_full_domains_v2.3_GC.txt
-
+```bash
+code/gc_correction.R results/HG00250_read.depth.bed data/hg38_duf_full_domains_v2.3_GC.txt
+```
 
 ## Other useful scripts
 
@@ -225,8 +241,5 @@ single fragment, and separates discordant pairs into single end reads. The
 lengths of the single end reads are extended by half the mean fragment size,
 which is determined from the data itself. The extended length is sampled from a
 normal distribution using the mean and standard deviation of the measured fragment sizes.
-
-
-
 
 
