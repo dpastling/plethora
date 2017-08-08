@@ -110,7 +110,7 @@ networking issues or from heavy usage from other users of the computational clus
 So you may have to submit some of these steps to the queue separately.
 
 
-0. Edit the `config.sh` file to adapt the paths and sample list for your environment
+#### 0. Edit the `config.sh` file to adapt the paths and sample list for your environment
 
 The config file is where all the project specific parameters and sample names
 should go. The other scripts in the pipeline should be kept as abstract as possible for reuse. 
@@ -129,7 +129,7 @@ Here are few important variables required by the pipeline:
 The config file will also create directories where all the results will go.
 
 
-1. Download the fastq files from the 1000 Genomes Project
+#### 1. Download the fastq files from the 1000 Genomes Project
 
 ```bash
 bsub < code/1000genomes/1_download.sh
@@ -146,7 +146,7 @@ code/download_fastq.pl HG00250 data/1000Genomes_samples.txt
 ```
 
 
-2.  Trim and filter the reads
+#### 2.  Trim and filter the reads
 
 ```bash
 bsub < code/1000genomes/2_trim.sh
@@ -155,7 +155,7 @@ bsub < code/1000genomes/2_trim.sh
 This script automates the read trimming by Cutadapt. Alternativly, Cutadapt could be run directly as described in the Quick Start guide above.
 
 
-3. Align reads to the genome
+#### 3. Align reads to the genome
 
 ```bash
 bsub < code/1000genomes/3_batch_bowtie.sh
@@ -166,7 +166,7 @@ This script automates the Bowtie2 alignments for the filtered reads generated ab
 Alterativly, Bowtie2 can be run separately using the shell script `code/bowtie.sh` 
 
 
-4. (Optional) Remove temporary files
+#### 4. (Optional) Remove temporary files
 
 ```bash
 bsub < code/1000genomes/4_batch_clean.sh
@@ -192,7 +192,7 @@ code/clean_files.pl -h
 ```
 
 
-5. Calculate coverage for each region of interest
+#### 5. Calculate coverage for each region of interest
 
 ```bash
 bsub < code/1000genomes/5_make_bed.sh
@@ -210,12 +210,12 @@ fragment
 overlap) / (domain length)
 
 
-6. (Optional) Remove temporary files
+#### 6. (Optional) Remove temporary files
 
 This script is a link to the script above. At this stage it can remove the alignment and fastq files if present.
 
 
-7. Correct coverage for GC bias
+#### 7. Correct coverage for GC bias
 
 ```bash
 bsub < code/1000genomes/7_batch_gc_correction.sh
