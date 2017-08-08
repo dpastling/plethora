@@ -14,7 +14,7 @@ published in the forthcoming paper:
 ## Dependencies
 
 Plethora depends on the following software. Note that updates to samtools and
-bedtools may break plethora due to changes with the parameters
+bedtools may break plethora due to recent parameter changes
 
 - bowtie2 version 2.2.9
 - bedtools version 2.17.0
@@ -25,6 +25,9 @@ bedtools may break plethora due to changes with the parameters
 
 You will also need to download the human genome hg38 and build a bowtie index
 for it. Instructions for doing this can be found on the Bowtie2 website.
+
+
+    pip install --user --upgrade cutadapt
 
 
 ## Quick Start
