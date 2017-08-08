@@ -237,13 +237,27 @@ code/gc_correction.R results/HG00250_read.depth.bed data/hg38_duf_full_domains_v
 
 ## Other useful scripts
 
-### preprocessing\_1000genomes.R
+#### preprocessing\_1000genomes.R
 
-### build\_gc\_model.sh
+This script is how we selected the ~300 samples from the full `sample.index`
+file for the 1000 Genomes Project. It filters out the exome sequencing data,
+selects samples with reasonably high coverage, etc. It tries to collect
+representative samples from each of the populations.
 
-### gc\_from\_fasta.pl
 
-### merge\_pairs.pl
+#### build\_gc\_model.sh
+
+This script calculates the percent GC content for a set of domains. This is
+wrapper script for the script below for submitting a specific version of the
+DUF1220 annotation to the LSF queue.
+
+#### gc\_from\_fasta.pl
+
+This script calculates the percent GC content for a set of domains and is called
+by the batch script above. Required are a set of domains in .bed file format and
+a .fasta file for the genome reference
+
+#### merge\_pairs.pl
 
 This is a helper script to `make_bed.sh` that combines proper pairs into a
 single fragment, and separates discordant pairs into single end reads. The
