@@ -23,16 +23,19 @@ bedtools may break plethora due to recent parameter changes
 - Perl module: Math::Random
 - Perl module: Math::Complex
 
-You will also need to download the human genome hg38 and build a bowtie index
+You will also need to download the human genome hg38 and build a Bowtie index
 for it. Instructions for doing this can be found on the Bowtie2 website.
 
-
-    pip install --user --upgrade cutadapt
+A script for installing the dependencies is included `code/install_tools.sh`
 
 
 ## Quick Start
 
-The following illustrates the minimal steps necessary to run the pipeline. The simulated sequence data are for a single DUF1220 domain, so this should run very quickly relative to a full WGS data set. The following code can also be used to test that your environment has been set up correctly and that the installed software is working.
+The following illustrates the minimal steps necessary to run the pipeline. The
+test data are simulated reads for a single DUF1220 domain, so this should run
+relatively quickly versus a full WGS data set. The following code can also be used to
+test that your environment has been set up correctly and that the installed
+software is working.
 
 1. Create directories for the resulting files (if they don't exist already)
 
@@ -41,7 +44,9 @@ mkdir alignments
 mkdir results
 ```
 
-2. Trim low quality bases from the 3' ends of the reads and remove any that are shorter than 80bp. Since we are working with simulated reads, we don't expect many reads to be effected by this.
+2. Trim low quality bases from the 3' ends of the reads and remove any that are
+shorter than 80 bp. Since we are working with simulated data, we don't expect
+many reads to be effected by this.
 
 ```bash
 cutadapt \
@@ -75,7 +80,7 @@ code/make_bed.sh \
 ```
 
 The resulting file `test_read_depth.bed` has the coverage for each domain. The reads were
-simulated from NBPF1\_CON1\_1 at 30x coverage. Bases on prior work, we expect to
+simulated from NBPF1\_CON1\_1 at 30x coverage. Based on prior work, we expect to
 find that most reads align to NBPF1\_CON1\_1, but some reads will map to one of
 the other CON1 domains of NBPF1 or to NBPF1L.
 
@@ -94,11 +99,12 @@ awk '$2 > 0' results/test_read_depth.bed
 
 The following describes how to apply plethora to the 1000 Genomes data and
 describes the main steps in a little more detail. The scripts for processing the
-1000 Genomes data can be found in the `code/1000genomes` folder. These scripts
-are for submitting jobs to the LSF job queuing system for parallelizing the
-processing of multiple samples. These scripts can be modified for use with 
-other job queuing systems (such as PBS or Slurm). Alternatively the scripts in the main `code` folder
-can be run individually without a job scheduler as described above.
+1000 Genomes data can be found in the folder `code/1000genomes`. These scripts
+are for submitting jobs to the LSF job queuing system for processing multiple
+samples in parallel. These scripts can be modified for use with 
+other job queuing systems (such as PBS or Slurm). Alternatively, the scripts in the main `code` folder
+can be run individually without using a job scheduler (as shown in the quick
+start guide).
 
 If everything has been configured correctly, you should be able to process the
 entire dataset with the following command:
@@ -118,12 +124,12 @@ should go. The other scripts in the pipeline should be kept as abstract as possi
 Here are few important variables required by the pipeline:
 
 - **sample_index** path to the file with the 1000 Genomes information
-- **genome** path to the bowtie indices for genome
+- **genome** path to the Bowtie indices for genome
 - **master_ref** path to the bedfile with the DUF1220 coordinates, or other
   regions of interest
-- **alignment_dir** path to where the bowtie alignments will go
+- **alignment_dir** path to where the Bowtie2 alignments will go
 - **result_folder** path to where the resulting coverage files will be stored
-- **bowtie_params** additional parameters to be passed to bowtie2 that are
+- **bowtie_params** additional parameters to be passed to Bowtie2 that are
   specific to the project
 
 The config file will also create directories where all the results will go.
@@ -139,7 +145,7 @@ This script downloads the fastq files for each sample from the 1000
 Genomes site as specified in a sample\_index file. The script fetches all associated files with a given sample name and uses `wget` to download the files to the `fastq` folder. The script checks the md5sum hashes for each file against the
 downloaded file. The script exits with an error if they do not match.
 
-Alternativly, if you are not using the LSF queuing system, the script can be run manually like so:
+Alternatively, if you are not using the LSF queuing system, the script can be run manually like so:
 
 ```bash
 code/download_fastq.pl HG00250 data/1000Genomes_samples.txt 
@@ -152,7 +158,8 @@ code/download_fastq.pl HG00250 data/1000Genomes_samples.txt
 bsub < code/1000genomes/2_trim.sh
 ```
 
-This script automates the read trimming by Cutadapt. Alternativly, Cutadapt could be run directly as described in the Quick Start guide above.
+This script automates the read trimming by Cutadapt. Alternatively, Cutadapt
+could be run directly as described in the quick start guide above.
 
 
 #### 3. Align reads to the genome
@@ -163,7 +170,7 @@ bsub < code/1000genomes/3_batch_bowtie.sh
 
 This script automates the Bowtie2 alignments for the filtered reads generated above.
 
-Alterativly, Bowtie2 can be run separately using the shell script `code/bowtie.sh` 
+Alternatively, Bowtie2 can be run separately using the shell script `code/bowtie.sh` 
 
 
 #### 4. (Optional) Remove temporary files
@@ -172,14 +179,15 @@ Alterativly, Bowtie2 can be run separately using the shell script `code/bowtie.s
 bsub < code/1000genomes/4_batch_clean.sh
 ```
 
-This script removes intermediate files after the later steps in the pipeline have completed. This is useful because the WGS files can take up a lot of disk space. This script first confirms that files from previous steps have been run correctly before removing them. 
+This script removes intermediate files from earlier stages of the pipeline. This is useful because WGS files can take up a lot of disk space. This script first confirms that files from previous steps have been run correctly before removing them. 
 
 By default it assumes that the number of reads in the fastq file are
 correct (verified via checksum or read counting). Optionally you can provide a
 file with the expected number of reads. The script deletes the file from a
 prior step if the file in the next step has the correct number of reads (e.g.
-deleted the original bam file if the sorted bam has the correct number of
-reads).
+delete the original bam file if the sorted bam has the correct number of
+reads and delete the sorted bam if the resulting bed file has the correct number
+of reads).
 
 If the data have been downloaded from a public repository like the 1000 Genomes, this script can remove the fastq files by passing an optional flag.
 
@@ -227,7 +235,7 @@ bsub < code/1000genomes/7_batch_gc_correction.sh
 
 This script performs the GC correction step using conserved regions that are
 assumed to be found in diploid copy number. This script requires the `_read.depth.bed` file 
-generated in step five above as well as a file with the percent GC content for each domain.
+generated in step 5 above as well as a file with the percent GC content for each domain.
 
 Behind the scenes, this shell script calls `code/gc_correction.R` which can be run manually like so:
 
@@ -245,17 +253,18 @@ selects samples with reasonably high coverage, etc. It tries to collect
 representative samples from each of the populations.
 
 
-#### build\_gc\_model.sh
-
-This script calculates the percent GC content for a set of domains. This is
-wrapper script for the script below for submitting a specific version of the
-DUF1220 annotation to the LSF queue.
-
 #### gc\_from\_fasta.pl
 
 This script calculates the percent GC content for a set of domains and is called
 by the batch script above. Required are a set of domains in .bed file format and
 a .fasta file for the genome reference
+
+
+#### build\_gc\_model.sh
+
+This an LSF script for submitting a specific version of the DUF1220 annotation
+to the LSF queue.
+
 
 #### merge\_pairs.pl
 
