@@ -4,12 +4,11 @@
 Plethora is a tool kit for copy number variation (CNV) analysis of highly
 duplicated regions.  It was tailored specifically for the DUF1220 domain which
 is found in over 300 copies in the human genome. However it could be applied to
-other high copy domains and segmental duplications. The details will be
-published in the forthcoming paper:
+other high copy domains and segmental duplications. The details are published [here](https://doi.org/10.1186/s12864-017-3976-z):
 
 > Astling, DP, Heft IE, Jones, KL, Sikela, JM. "High resolution measurement of
 > DUF1220 domain copy number from whole genome sequence data" (2017) BMC
-> Genomics. under review
+> Genomics. 18:614. https://doi.org/10.1186/s12864-017-3976-z
 
 ## Dependencies
 
